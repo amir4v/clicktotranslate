@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click to Translate</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body style="padding: 1%; font-family: Sahel; font-size: 18px;">
+    {% for t in text %}
+        <span onclick="clicktotranslate(this)" style="font-family: Sahel;">{{ t }}</span>&nbsp;
+    {% endfor %}
+
+    <div id="translated" style="border: 1px solid gray; padding: 1%; margin-top: 1%; text-align: center; direction: ltr; font-family: Sahel;"></div>
+
+    <script>
+        function clicktotranslate(e) {
+            var translated = document.getElementById('translated');
+            word = e.innerHTML;
+            $.ajax({
+                url: '/translate?word=' + word,
+                type: 'GET',
+                success: function(data) {
+                    translated.innerHTML = data;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
