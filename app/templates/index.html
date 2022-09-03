@@ -7,10 +7,34 @@
     <title>Click to Translate</title>
 </head>
 <body>
-    <form action="/translate" method="post">
+
+    <h1>Add New Text</h1>
+    <form action="/new-text" method="post">
         {% csrf_token %}
-        <textarea name="text" id="text" cols="30" rows="10"></textarea>
-        <input type="submit">
+        <div>
+            <center>
+                Title: <input type="text" name="title">
+            </center>
+            <br>
+            Content: <textarea name="content" id="text" cols="100" rows="20"></textarea>
+            <br>
+            <center>
+                <input type="submit" style="font-size: 1.5em;">
+            </center>
+        </div>
     </form>
+    <hr>
+
+    <h1>Texts</h1>
+    <ul>
+    {% for text in texts %}
+        <li>
+            <a href="/translate/{{ text.id }}/{{ text.title }}">{{ text.title }}</a>
+            |
+            <a href="/i-do-not-know-list/{{ text.id }}">i-do-not-know-list</a>
+        </li>
+    {% endfor %}
+    </ul>
+
 </body>
 </html>

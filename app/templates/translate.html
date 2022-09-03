@@ -8,8 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body style="padding: 1%; font-family: Sahel; font-size: 18px;">
-    {% for t in text %}
-        <span onclick="clicktotranslate(this)" style="font-family: Sahel;">{{ t }}</span>&nbsp;
+    {% for word in content %}
+        <span onclick="clicktotranslate(this)" style="font-family: Sahel;">{{ word }}</span>&nbsp;
     {% endfor %}
 
     <div id="translated" style="border: 1px solid gray; padding: 1%; margin-top: 1%; text-align: center; direction: ltr; font-family: Sahel;"></div>
@@ -19,11 +19,27 @@
             var translated = document.getElementById('translated');
             word = e.innerHTML;
             $.ajax({
-                url: '/translate?word=' + word,
-                type: 'GET',
+                url: '/translate',
+                type: 'POST',
+                data: {
+                    word: word
+                },
                 success: function(data) {
-                    translated.innerHTML = data;
+                    console.log(data);
+                    translated.innerHTML = `<span onclick="idonotknow(` +data.id+ `)">` +data.word+ `</span>`;
                 }
+            });
+        }
+
+        function idonotknow(word_id) {
+            $.ajax({
+                url: '/i-do-not-know',
+                type: 'POST',
+                data: {
+                    text_id: {{ text_id }},
+                    word_id: word_id
+                },
+                success: function(data) { }
             });
         }
     </script>
