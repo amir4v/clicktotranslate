@@ -20,7 +20,7 @@ def new_text(request):
 def translate(request, id=0, s=''):
     if request.method == "GET":
         text = Text.objects.get(pk=id)
-        content = text.content.split()
+        content = text.content.replace('\n', '<br>').split()
         return render(request, 'translate.html', {'content': content, 'text': text})
     
     en = list(request.POST.get('word').lower())
