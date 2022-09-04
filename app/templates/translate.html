@@ -2,11 +2,32 @@
 
 {% block body %}
 
-{% for word in content %}
-<span onclick="clicktotranslate(this)" class="on_hover_text_decoration_underline">{{ word }}</span>&nbsp;
-{% endfor %}
+<center>
+    <h1>
+        {{ text.title }}
+        <hr>
+    </h1>
+</center>
+<br><br><br>
 
-<div id="translated" style="border: 1px solid gray; padding: 1%; margin-top: 1%; text-align: center; direction: ltr;"></div>
+<p style="line-height: 70px;">
+    {% for word in content %}
+    <span onclick="clicktotranslate(this)" class="on_hover_text_decoration_underline">{{ word|safe }}</span>&nbsp;
+    {% endfor %}
+</p>
+
+<div id="translated" style="
+    border: 1px solid gray;
+    padding: 1%; margin-top: 1%;
+    text-align: center;
+
+    background-color: antiquewhite;
+
+    position: fixed;
+    top: 800px;
+    left: 1400px;
+    ">
+X</div>
 
 <script>
     function clicktotranslate(e) {
@@ -30,7 +51,7 @@
             url: '/i-do-not-know',
             type: 'POST',
             data: {
-                text_id: {{ text_id }},
+                text_id: {{ text.id }},
                 word_id: word_id
             },
             success: function(data) { }

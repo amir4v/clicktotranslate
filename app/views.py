@@ -20,9 +20,8 @@ def new_text(request):
 def translate(request, id=0, s=''):
     if request.method == "GET":
         text = Text.objects.get(pk=id)
-        content = text.content.split(' ')
-        text_id = text.id
-        return render(request, 'translate.html', {'content': content, 'text_id': text_id})
+        content = text.content.split()
+        return render(request, 'translate.html', {'content': content, 'text': text})
     
     en = list(request.POST.get('word').lower())
     for c in en:
