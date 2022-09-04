@@ -1,47 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Click to Translate</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-</head>
-<body style="padding: 1%; font-family: Sahel; font-size: 18px;">
-    {% for word in content %}
-        <span onclick="clicktotranslate(this)" style="font-family: Sahel;">{{ word }}</span>&nbsp;
-    {% endfor %}
+{% extends 'base.html' %}
 
-    <div id="translated" style="border: 1px solid gray; padding: 1%; margin-top: 1%; text-align: center; direction: ltr; font-family: Sahel;"></div>
+{% block body %}
 
-    <script>
-        function clicktotranslate(e) {
-            var translated = document.getElementById('translated');
-            word = e.innerHTML;
-            $.ajax({
-                url: '/translate',
-                type: 'POST',
-                data: {
-                    word: word
-                },
-                success: function(data) {
-                    console.log(data);
-                    translated.innerHTML = `<span onclick="idonotknow(` +data.id+ `)">` +data.word+ `</span>`;
-                }
+{% for word in content %}
+<span onclick="clicktotranslate(this)" class="on_hover_text_decoration_underline">{{ word }}</span>&nbsp;
+{% endfor %}
+
+<div id="translated" style="border: 1px solid gray; padding: 1%; margin-top: 1%; text-align: center; direction: ltr;"></div>
+
+<script>
+    function clicktotranslate(e) {
+        var translated = document.getElementById('translated');
+        word = e.innerHTML;
+        $.ajax({
+            url: '/translate',
+            type: 'POST',
+            data: {
+                word: word
+            },
+            success: function(data) {
+                console.log(data);
+                translated.innerHTML = `<b style="text-decoration: underline; cursor: pointer;"><span onclick="idonotknow(` +data.id+ `)">` +data.word+ `</span></b>`;
+                    }
             });
         }
 
-        function idonotknow(word_id) {
-            $.ajax({
-                url: '/i-do-not-know',
-                type: 'POST',
-                data: {
-                    text_id: {{ text_id }},
-                    word_id: word_id
-                },
-                success: function(data) { }
+    function idonotknow(word_id) {
+        $.ajax({
+            url: '/i-do-not-know',
+            type: 'POST',
+            data: {
+                text_id: {{ text_id }},
+                word_id: word_id
+            },
+            success: function(data) { }
             });
         }
-    </script>
-</body>
-</html>
+</script>
+
+{% endblock %}

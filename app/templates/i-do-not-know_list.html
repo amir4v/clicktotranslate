@@ -1,15 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>i-do-not-know_list</title>
-</head>
-<body>
-    {% for word in words %}
-    <b>{{ word }}</b>
-    <br>
-    {% endfor %}
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block body %}
+
+<center>
+    <h1>
+        {{ text.title }}
+        <hr>
+    </h1>
+</center>
+
+<br><br><br>
+
+{% for word in words %}
+<a href="/word/delete/{{ word.id }}/{{ text.id }}" style="text-decoration: none;"><b>(x)</b></a>
+&nbsp; - &nbsp;
+
+<b>{{ word }}</b>
+<br><br><br>
+{% endfor %}
+
+{% endblock %}

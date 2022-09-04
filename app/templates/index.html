@@ -1,40 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Click to Translate</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-    <h1>Add New Text</h1>
-    <form action="/new-text" method="post">
-        {% csrf_token %}
-        <div>
-            <center>
-                Title: <input type="text" name="title">
-            </center>
-            <br>
-            Content: <textarea name="content" id="text" cols="100" rows="20"></textarea>
-            <br>
-            <center>
-                <input type="submit" style="font-size: 1.5em;">
-            </center>
-        </div>
-    </form>
-    <hr>
+{% block body %}
 
-    <h1>Texts</h1>
-    <ul>
-    {% for text in texts %}
-        <li>
-            <a href="/translate/{{ text.id }}/{{ text.title }}">{{ text.title }}</a>
-            |
-            <a href="/i-do-not-know-list/{{ text.id }}">i-do-not-know-list</a>
-        </li>
-    {% endfor %}
-    </ul>
+<h1>Add New Text</h1>
+<form action="/new-text" method="post">
+    {% csrf_token %}
+    <div>
+        <center>
+            Title: <input type="text" name="title">
+        </center>
+        <br>
+        Content: <textarea name="content" id="text" cols="100" rows="20"></textarea>
+        <br>
+        <center>
+            <input type="submit">
+        </center>
+    </div>
+</form>
+<hr>
 
-</body>
-</html>
+<h1>Texts</h1>
+<ul>
+{% for text in texts %}
+    <li>
+        <a href="/text/delete/{{ text.id }}" style="text-decoration: none;"><b>(x)</b></a>
+        &nbsp; - &nbsp;
+        
+        <a href="/translate/{{ text.id }}/{{ text.title }}">{{ text.title }}</a>
+        &nbsp;--->&nbsp;
+        <a href="/i-do-not-know-list/{{ text.id }}">i-do-not-know-list</a>
+    </li>
+    <br>
+{% endfor %}
+</ul>
+
+{% endblock %}

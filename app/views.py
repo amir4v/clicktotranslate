@@ -5,13 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 def index(request):
-    # from stuff import read_from_both as r
-    # from app.models import Word
-    # words = [
-    #     Word(en=w[0], fa=w[1]) for w in r.get()
-    # ]
-    # Word.objects.bulk_create(words)
-
     texts = Text.objects.all()
     return render(request, 'index.html', {'texts': texts})
 
@@ -41,7 +34,7 @@ def translate(request, id=0, s=''):
     return JsonResponse(
         {
             'id': word.id,
-            'word':str(word)
+            'word': str(word)
             }
         )
 
@@ -52,7 +45,7 @@ def i_do_not_know(request):
     text_id = request.POST['text_id']
     text = Text.objects.get(pk=text_id)
     word = Word.objects.get(pk=word_id)
-    if not text.words.exists(word):
+    if not text.words.filter(pk=word_id).exists():
         text.words.add(word)
     return HttpResponse("OK")
 
@@ -60,4 +53,17 @@ def i_do_not_know(request):
 def i_do_not_know_list(request, id):
     text = Text.objects.get(pk=id)
     words = text.words.all()
-    return render(request, 'i-do-not-know_list.html', {'words': words})
+    return render(request, 'i-do-not-know_list.html', {'words': words, 'text': text})
+
+
+def word_delete(request, id, text_id):
+    word = Word.objects.get(pk=id)
+    text = Text.objects.get(pk=text_id)
+    
+    text.words.remove(word)
+    return redirect(f'/i-do-not-know-list/{text_id}')
+
+
+def text_delete(request, id):
+    Text.objects.get(pk=id).delete()
+    return redirect('/')
