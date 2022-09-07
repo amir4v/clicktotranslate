@@ -23,10 +23,10 @@ def translate(request, id=0, s=''):
         content = text.content.replace('\n', '<br>').split()
         return render(request, 'translate.html', {'content': content, 'text': text})
     
-    en = list(request.POST.get('word').lower())
-    for c in en:
-        if c not in 'qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP':
-            en.remove(c)
+    en = list(request.POST.get('word').lower().replace('<br>', ''))
+    en = [
+        c for c in en if c in 'qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP'
+    ]    
     en = ''.join(en)
     
     word = Word.objects.get(en=en)
