@@ -13,6 +13,16 @@ def new_text(request):
     title = request.POST['title']
     content = request.POST['content']
     Text.objects.create(title=title, content=content)
+    
+    # (Words of): title - Words
+    title = title + ' - Words'
+    content = '\n '.join((
+        word
+            for word in
+                set(content.lower().split())
+    ))
+    Text.objects.create(title=title, content=content)
+    
     return redirect('/')
 
 
