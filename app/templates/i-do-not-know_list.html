@@ -10,6 +10,9 @@
 </center>
 <br><br><br>
 
+---{{ words.count }}--- Words that i don't know.
+<br><br><br>
+
 {% for word in words %}
 <a href="/word/delete/{{ word.id }}/{{ text.id }}" style="text-decoration: none;"><b>(x)</b></a>
 &nbsp; - &nbsp;
