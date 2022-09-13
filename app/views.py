@@ -34,8 +34,11 @@ def translate(request, id=0, s=''):
         
         if text.title.endswith(' - Words'):
             # [:START Show all words from last word that i checked that as i-do-not-know]
-            last_word = text.words.order_by('app_text_words.id').last().en # last_word_that_i_do_not_know
-            last_index = content.find(last_word) + len(last_word) # last_word_last_index
+            try:
+                last_word = text.words.order_by('app_text_words.id').last().en # last_word_that_i_do_not_know
+                last_index = content.find(last_word) + len(last_word) # last_word_last_index
+            except:
+                last_index = 0
             content = content[last_index:]
             # [:END]
             br = True
