@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load app_extras %}
+
 {% block body %}
 
 <center>
@@ -12,7 +14,15 @@
 
 <p style="line-height: 70px;">
     {% for word in content %}
-    <span onclick="clicktotranslate(this)" class="on_hover_text_decoration_underline">{{ word|safe }}</span>&nbsp;
+        <span onclick="clicktotranslate(this)" class="on_hover_text_decoration_underline">{{ word|safe }}</span>
+
+        {% if br %}
+            <input type="checkbox"
+                {{ word|doiknow:text.id }}
+                style="width: 25px; height: 25px; position: relative; top: 7px;"
+                onchange="idonotknow_checkbox(this)" word='"{{ word }}"'>
+            <br><br>
+        {% endif %}
     {% endfor %}
 </p>
 
@@ -53,6 +63,29 @@ X</div>
             data: {
                 text_id: {{ text.id }},
                 word_id: word_id
+            },
+            success: function(data) { }
+            });
+        }
+    
+    function idonotknow_checkbox(e) {
+        word = e.getAttribute("word");
+        operation = ""
+        
+        if (e.checked == true) {
+            operation = "add";
+        }
+        if (e.checked == false) {
+            operation = "remove";
+        }
+
+        $.ajax({
+            url: '/i-do-not-know-checkbox',
+            type: 'POST',
+            data: {
+                operation: operation,
+                text_id: {{ text.id }},
+                word: word
             },
             success: function(data) { }
             });

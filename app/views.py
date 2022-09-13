@@ -30,10 +30,18 @@ def new_text(request):
 def translate(request, id=0, s=''):
     if request.method == "GET":
         text = Text.objects.get(pk=id)
-        content = text.content.replace('\n', '<br>').split()
-        return render(request, 'translate.html', {'content': content, 'text': text})
+        # content = text.content.replace('\n', '<br>').split()
+        
+        if text.title.endswith(' - Words'):
+            br = True
+            content = [w.strip() for w in text.content.replace('\n', ' ').replace('  ', ' ').split()]
+        else:
+            br = False
+            content = [w.strip() for w in text.content.replace('\n', '<br>').replace('  ', ' ').split()]
+        
+        return render(request, 'translate.html', {'content': content, 'text': text, 'br': br})
     
-    en = list(request.POST.get('word').lower().replace('<br>', ''))
+    en = list(request.POST.get('word').lower().strip().replace('<br>', ''))
     en = [
         c for c in en if c in 'qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP'
     ]    
@@ -59,9 +67,35 @@ def i_do_not_know(request):
     return HttpResponse("OK")
 
 
+@csrf_exempt
+def i_do_not_know_checkbox(request):
+    operation = request.POST['operation']
+    
+    text_id = request.POST['text_id']
+    text = Text.objects.get(pk=text_id)
+    
+    en = request.POST['word']
+    en = list(en.lower().strip().replace('<br>', ''))
+    en = [
+        c for c in en if c in 'qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP'
+    ]    
+    en = ''.join(en)
+    word = Word.objects.get(en=en)
+    
+    if operation == 'add':
+        if not text.words.filter(pk=word.id).exists():
+            text.words.add(word)
+    
+    if operation == 'remove':
+        text.words.remove(word)
+    
+    return HttpResponse("OK")
+
+
 def i_do_not_know_list(request, id):
     text = Text.objects.get(pk=id)
-    words = text.words.all()
+    words = text.words.order_by('app_text_words.id')
+    
     return render(request, 'i-do-not-know_list.html', {'words': words, 'text': text})
 
 
