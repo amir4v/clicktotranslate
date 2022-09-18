@@ -7,8 +7,11 @@
 <center>
     <h1>
         {{ text.title }}
-        <hr>
     </h1>
+    {% if br %}
+        <small style="font-size: 0.8em;">{{ count }} - Words Reamined</small>
+    {% endif %}
+    <hr>
 </center>
 <br><br><br>
 

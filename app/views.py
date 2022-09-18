@@ -47,7 +47,7 @@ def translate(request, id=0, s=''):
             br = False
             content = [w.strip() for w in content.replace('\n', '<br>').replace('  ', ' ').split()]
         
-        return render(request, 'translate.html', {'content': content, 'text': text, 'br': br})
+        return render(request, 'translate.html', {'content': content, 'text': text, 'br': br, 'count': len(content)})
     
     en = list(request.POST.get('word').lower().strip().replace('<br>', ''))
     en = [
