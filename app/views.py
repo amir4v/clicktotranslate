@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from .models import Word, Text
 from django.views.decorators.csrf import csrf_exempt
+from .models import Word, Text
 
 
 def index(request):
@@ -27,7 +27,10 @@ def new_text(request):
 
 
 @csrf_exempt
-def translate(request, id=0, s=''):
+def translate(request, id=0, s='', page=1):
+    # Each page == 100 words
+    pp = 100 # Per-Page
+    
     if request.method == "GET":
         text = Text.objects.get(pk=id)
         content = text.content
@@ -40,14 +43,20 @@ def translate(request, id=0, s=''):
             except:
                 last_index = 0
             content = content[last_index:]
+            count = len(content)
             # [:END]
             br = True
             content = [w.strip() for w in content.replace('\n', ' ').replace('  ', ' ').split()]
+            content = content[
+                        pp*(page-1)
+                        :
+                        pp*(page)
+                        ]
         else:
             br = False
             content = [w.strip() for w in content.replace('\n', '<br>').replace('  ', ' ').split()]
         
-        return render(request, 'translate.html', {'content': content, 'text': text, 'br': br, 'count': len(content)})
+        return render(request, 'translate.html', {'content': content, 'text': text, 'br': br, 'count': count, 'page': page+1})
     
     en = list(request.POST.get('word').lower().strip().replace('<br>', ''))
     en = [
