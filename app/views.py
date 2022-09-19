@@ -43,10 +43,10 @@ def translate(request, id=0, s='', page=1):
             except:
                 last_index = 0
             content = content[last_index:]
-            count = len(content)
             # [:END]
             br = True
             content = [w.strip() for w in content.replace('\n', ' ').replace('  ', ' ').split()]
+            count = len(content)
             content = content[
                         pp*(page-1)
                         :
