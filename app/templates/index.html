@@ -26,9 +26,10 @@
         <a href="/text/delete/{{ text.id }}" style="text-decoration: none;"><b>(x)</b></a>
         &nbsp; - &nbsp;
         
-        <a href="/translate/{{ text.id }}/{{ text.title }}">{{ text.title }}</a>
+        <a href="/translate/{{ text.id }}">{{ text.title }}</a>
         &nbsp;--->&nbsp;
-        <a href="/i-do-not-know-list/{{ text.id }}">i-do-not-know-list</a>
+        <a href="/translate/{{ text.id }}/1">All-Words</a>
+        <!--                             /all_words=[1 OR True]                             -->
     </li>
     <br>
 {% endfor %}

@@ -8,35 +8,35 @@
     <h1>
         {{ text.title }}
     </h1>
-    {% if br %}
-        <small style="font-size: 0.8em;">{{ count }} - Words Reamined</small>
-    {% endif %}
+    <br>
     <hr>
 </center>
-<br><br><br>
+<br><br>
 
 <p style="line-height: 70px;">
-    {% for word in content %}
-        <span onclick="clicktotranslate(this)" class="on_hover_text_decoration_underline">{{ word|safe }}</span>
-
-        {% if br %}
-            <input type="checkbox"
-                {{ word|doiknow:text.id }}
-                style="width: 25px; height: 25px; position: relative; top: 7px;"
-                onchange="idonotknow_checkbox(this)" word='"{{ word }}"'>
+    {% for word in words %}
+    <span onclick="clicktotranslate(this)" class="on_hover_text_decoration_underline">{{ word.en|safe }}</span>
+    
+    {% if br %}
+        <input type="checkbox"
+            style="width: 25px; height: 25px; position: relative; top: 7px;"
+            onchange="i_know_checkbox(this)" word='"{{ word.en }}"'>
             <br><br>
         {% endif %}
-    {% endfor %}
-
+    
+        {% endfor %}
+                
     <center>
         <hr><br>
-        <a href="/translate/{{ text.id }}/s/{{ page }}">
+        <a href="/translate/{{ text.id }}/1">
             <b style="text-decoration: underline;">
-                -{{ page }}-
+                Next
             </b>
         </a>
         <br><br><hr>
     </center>
+    
+    count: {{ count }}
 </p>
 
 <div id="translated" style="
@@ -47,7 +47,7 @@
     background-color: antiquewhite;
 
     position: fixed;
-    top: 750px;
+    top: 700px;
     left: 750px;
     ">
 X</div>
@@ -69,9 +69,9 @@ X</div>
             });
         }
 
-    function idonotknow(word_id) {
+    function i_know(word_id) {
         $.ajax({
-            url: '/i-do-not-know',
+            url: '/i-know',
             type: 'POST',
             data: {
                 text_id: {{ text.id }},
@@ -81,7 +81,7 @@ X</div>
             });
         }
     
-    function idonotknow_checkbox(e) {
+    function i_know_checkbox(e) {
         word = e.getAttribute("word");
         operation = ""
         
@@ -93,7 +93,7 @@ X</div>
         }
 
         $.ajax({
-            url: '/i-do-not-know-checkbox',
+            url: '/i-know-checkbox',
             type: 'POST',
             data: {
                 operation: operation,

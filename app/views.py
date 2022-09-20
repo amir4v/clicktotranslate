@@ -1,7 +1,17 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import F, Expression, Q, Subquery
 from .models import Word, Text
+
+
+def clean_en(en):
+    en = list(en.lower().strip().replace('<br>', ''))
+    en = [
+        c for c in en if c in 'qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP'
+    ]
+    en = ''.join(en)
+    return en
 
 
 def index(request):
@@ -12,59 +22,46 @@ def index(request):
 def new_text(request):
     title = request.POST['title']
     content = request.POST['content']
-    Text.objects.create(title=title, content=content)
+    text = Text.objects.create(title=title, content=content)
     
-    # (Words of): title - Words
-    title = title + ' - Words'
-    content = '\n '.join((
-        word
-            for word in
-                set(content.lower().split())
-    ))
-    Text.objects.create(title=title, content=content)
+    words = tuple( clean_en(word) for word in set(content.lower().split()) )
+    text.all_words.set(Word.objects.filter(en__in=words)) # All-Words that i have
     
     return redirect('/')
 
 
 @csrf_exempt
-def translate(request, id=0, s='', page=1):
-    # Each page == 100 words
-    pp = 100 # Per-Page
-    
+def translate(request, id=0, all_words=False):
     if request.method == "GET":
         text = Text.objects.get(pk=id)
-        content = text.content
         
-        if text.title.endswith(' - Words'):
-            # [:START Show all words from last word that i checked that as i-do-not-know]
-            try:
-                last_word = text.words.order_by('app_text_words.id').last().en # last_word_that_i_do_not_know
-                last_index = content.find(last_word) + len(last_word) # last_word_last_index
-            except:
-                last_index = 0
-            content = content[last_index:]
-            # [:END]
+        if all_words:
+            page=1
+            pp = 100 # Per-Page
+            
+            words = text.all_words.filter \
+                            (~Q(id__in=text.words_ik.values_list('id'))) \
+                            .order_by('?') \
+                            [
+                                pp*(page-1)
+                                :
+                                pp*(page)
+                            ]
             br = True
-            content = [w.strip() for w in content.replace('\n', ' ').replace('  ', ' ').split()]
-            count = len(content)
-            content = content[
-                        pp*(page-1)
-                        :
-                        pp*(page)
-                        ]
         else:
+            words = text.all_words.all()
             br = False
-            content = [w.strip() for w in content.replace('\n', '<br>').replace('  ', ' ').split()]
         
-        return render(request, 'translate.html', {'content': content, 'text': text, 'br': br, 'count': count, 'page': page+1})
+        count = text.all_words.filter(
+                                     ~Q(id__in=text.words_ik.values_list('id'))
+                                     ).count()
+        
+        return render(request, 'translate.html', {'words': words, 'text': text, 'br': br, 'count':count})
     
-    en = list(request.POST.get('word').lower().strip().replace('<br>', ''))
-    en = [
-        c for c in en if c in 'qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP'
-    ]    
-    en = ''.join(en)
-    
+    en = request.POST.get('word')
+    en = clean_en(en)
     word = Word.objects.get(en=en)
+    
     return JsonResponse(
         {
             'id': word.id,
@@ -74,53 +71,31 @@ def translate(request, id=0, s='', page=1):
 
 
 @csrf_exempt
-def i_do_not_know(request):
-    word_id = request.POST['word_id']
-    text_id = request.POST['text_id']
-    text = Text.objects.get(pk=text_id)
-    word = Word.objects.get(pk=word_id)
-    if not text.words.filter(pk=word_id).exists():
-        text.words.add(word)
-    return HttpResponse("OK")
-
-
-@csrf_exempt
-def i_do_not_know_checkbox(request):
+def i_know_checkbox(request):
     operation = request.POST['operation']
     
     text_id = request.POST['text_id']
     text = Text.objects.get(pk=text_id)
     
     en = request.POST['word']
-    en = list(en.lower().strip().replace('<br>', ''))
-    en = [
-        c for c in en if c in 'qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP'
-    ]    
-    en = ''.join(en)
+    en = clean_en(en)
     word = Word.objects.get(en=en)
     
     if operation == 'add':
-        if not text.words.filter(pk=word.id).exists():
-            text.words.add(word)
+        if not text.words_ik.filter(pk=word.id).exists():
+            text.words_ik.add(word)
     
     if operation == 'remove':
-        text.words.remove(word)
+        text.words_ik.remove(word)
     
     return HttpResponse("OK")
-
-
-def i_do_not_know_list(request, id):
-    text = Text.objects.get(pk=id)
-    words = text.words.order_by('app_text_words.id')
-    
-    return render(request, 'i-do-not-know_list.html', {'words': words, 'text': text})
 
 
 def word_delete(request, id, text_id):
     word = Word.objects.get(pk=id)
     text = Text.objects.get(pk=text_id)
     
-    text.words.remove(word)
+    text.words_ik.remove(word)
     return redirect(f'/i-do-not-know-list/{text_id}')
 
 
